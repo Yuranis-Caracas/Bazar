@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Supermercado El Bazar</title>
+    <link rel="icon" href="icono/tienda.ico" type="image/x-icon">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+        .navbar {
+            background-color: #2c3e50;
+            color: white;
+            padding: 1rem;
+            font-family: 'Courier New', Courier, monospace;
+        }
+        .navbar-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        .navbar-bottom {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .navbar h1 {
+            margin: 0;
+            flex-grow: 1;
+        }
+        .search-container {
+            display: flex;
+            align-items: center;
+            max-width: 400px;
+            margin: 0 2rem;
+        }
+        .search-container input {
+            padding: 0.5rem;
+            margin-right: 0.5rem;
+            border: none;
+            border-radius: 4px;
+            width: 250px;
+        }
+        .btn {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+        .nav-links > * {
+            margin: 0 1rem;
+        }
+        .dropdown {
+            position: relative;
+            display: inline-block;
+        }
+        .dropbtn {
+            background-color: transparent;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: #f9f9f9;
+            min-width: 400px;
+            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+            z-index: 1;
+            columns: 2;
+            padding: 1rem;
+        }
+        .dropdown-content a {
+            color: black;
+            padding: 8px 12px;
+            text-decoration: none;
+            display: block;
+        }
+        .dropdown-content a:hover {
+            background-color: #f1f1f1;
+        }
+        .dropdown:hover .dropdown-content {
+            display: block;
+        }
+        .product-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-around;
+            padding: 2rem;
+        }
+        .product-card {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin: 1rem;
+            padding: 1rem;
+            width: 250px;
+            text-align: center;
+        }
+        .product-card img {
+            max-width: 100%;
+            height: 150px;
+            object-fit: contain;
+            margin-bottom: 1rem;
+        }
+        .product-card h3 {
+            margin: 0.5rem 0;
+        }
+        .price {
+            font-weight: bold;
+            color: #e74c3c;
+        }
+        .availability {
+            margin: 0.5rem 0;
+        }
+        .available { color: green; }
+        .low-stock { color: orange; }
+        .out-of-stock { color: red; }
+
+        #cartModal {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 600px;
+            max-width: 90%;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            z-index: 1000;
+        }
+
+        #cartModal h2 {
+            text-align: left;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 10px;
+        }
+
+        .cart-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        .cart-table th {
+            background-color: #f8f9fa;
+            padding: 12px;
+            text-align: left;
+            border-bottom: 2px solid #dee2e6;
+        }
+
+        .cart-table td {
+            padding: 12px;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        .delete-btn {
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9em;
+        }
+
+        .delete-btn:hover {
+            background-color: #c82333;
+        }
+
+        .cart-total {
+            text-align: right;
+            font-weight: bold;
+            font-size: 1.2em;
+            margin: 20px 0;
+            padding-top: 10px;
+            border-top: 2px solid #dee2e6;
+        }
+
+        .payment-section {
+            margin: 20px 0;
+        }
+
+        .payment-section select {
+            padding: 8px;
+            margin-right: 10px;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+            width: 200px;
+        }
+
+        .cart-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+
+        .btn-primary {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .btn-primary:hover {
+            background-color: #0056b3;
+        }
+
+        .close-button {
+            position: absolute;
+            right: 20px;
+            top: 20px;
+            font-size: 1.5em;
+            cursor: pointer;
+            border: none;
+            background: none;
+        }
+
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+        }
+
+        #cartButton {
+            background: none;
+            border: none;
+            position: relative;
+            font-size: 24px;
+            cursor: pointer;
+            padding: 10px;
+            color: white;
+        }
+
+        #cartCount {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background-color: #e74c3c;
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="navbar-top">
+            <h1>SUPERMERCADO EL BAZAR</h1>
+            <div class="search-container">
+                <input type="text" placeholder="Buscar productos" id="searchInput">
+            </div>
+            <button id="cartButton">
+                🛒
+                <span id="cartCount">0</span>
+            </button>
+        </div>
+        <div class="navbar-bottom">
+            <div class="nav-links">
+                <div class="dropdown">
+                    <button class="dropbtn">Categorías</button>
+                    <div class="dropdown-content">
+                        <a href="#">🍚 Despensa</a>
+                        <a href="#">🥬 Frutas y Verduras</a>
+                        <a href="#">🥚 Huevos y Lácteos</a>
+                        <a href="#">🧊 Congelados</a>
+                        <a href="#">🧼 Aseo Hogar</a>
+                        <a href="#">🍾 Licores</a>
+                        <a href="#">🍗 Carne, Pollo Y Pescado</a>
+                        <a href="#">🧴 Cuidado Personal</a>
+                        <a href="#">🍞 Panadería</a>
+                        <a href="#">🥤 Bebidas</a>
+                    </div>
+                </div>
+                <a href="ofertas.html" style="color: white; text-decoration: none;">Ofertas</a>
+                <a href="contacto.html" style="color: white; text-decoration: none;">Contacto</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="product-container" id="productList"></div>
+
+    <div id="cartModal">
+        <button class="close-button" onclick="closeCart()">×</button>
+        <h2>Carrito de Compras</h2>
+        
+        <table class="cart-table">
+            <thead>
+                <tr>
+                    <th>Producto</th>
+                    <th>Cantidad</th>
+                    <th>Precio</th>
+                    <th>Subtotal</th>
+                    <th>Acción</th>
+                </tr>
+            </thead>
+            <tbody id="cartItems">
+            </tbody>
+        </table>
+
+        <div class="cart-total" id="cartTotal">
+            Total: $0,00
+        </div>
+
+        <div class="payment-section">
+            <select id="paymentMethod">
+                <option value="">Seleccione un método de pago</option>
+                <option value="nequi">Nequi</option>
+                <option value="bancolombia">Bancolombia</option>
+                <option value="bogota">Banco de Bogotá</option>
+                <option value="efectivo">Efectivo</option>
+            </select>
+            <button class="btn-primary" id="payButton">Proceder al Pago</button>
+        </div>
+
+        <p id="paymentMessage"></p>
+
+        <div class="cart-buttons">
+            <button class="btn-primary" id="emptyCartButton">Vaciar Carrito</button>
+            <button class="btn-primary" onclick="closeCart()">Cerrar</button>
+        </div>
+    </div>
+    
+    <div class="modal-overlay" onclick="closeCart()"></div>
+    
+    <script>
+        const products = [
+            { name: "Arroz", price: 35000, image: "imagenes/arroz.jpg" },
+            { name: "Leche", price: 3500, image: "imagenes/leche.jpg" },
+            { name: "Pan Tajado", price: 2000, image: "imagenes/pan.jpg" },
+            { name: "Huevos", price: 13000,  image: "imagenes/huevos.jpg" },
+            { name: "Manzanas", price: 500, image: "imagenes/manzanas.jpg" },
+            { name: "Harina", price: 1500, image: "imagenes/harina.jpg" },
+            { name: "Pasta", price: 4500, image: "imagenes/espagueti.jpg" },
+            { name: "Azúcar", price: 1500,  image: "imagenes/azucar.jpg" },
+            { name: "Aceite de oliva", price: 15000, image: "imagenes/aceite.jpg" },
+            { name: "Papa", price: 800,  image: "imagenes/papa.jpg" },
+            { name: "Tomate", price: 1000,  image: "imagenes/tomate.jpg" },
+            { name: "Cebolla", price: 500, image: "imagenes/cebolla.jpg" },
+            { name: "Papel Higiénico", price: 12000, image: "imagenes/papel.jpg" },
+            { name: "Jabón de Baño", price: 3500,  image: "imagenes/jabonb.jpg" },
+            { name: "Limpido", price: 4500, image: "imagenes/limpido.jpg" },
+            { name: "Lavaplatos", price: 3500,  image: "imagenes/lavaplatos.jpg" }
+        ];
+
+        let cart = [];
+
+        function formatPrice(price) {
+            return new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP' }).format(price);
+        }
+
+        function displayProducts(productsToShow) {
+            const productList = document.getElementById('productList');
+            productList.innerHTML = '';
+
+            if (productsToShow.length === 0) {
+                productList.innerHTML = '<p>No se encontraron productos que coincidan con su búsqueda.</p>';
+                return;
+            }
+
+            productsToShow.forEach(product => {
+                const productCard = document.createElement('div');
+                productCard.className = 'product-card';
+
+                productCard.innerHTML = `
+                    <img src="${product.image}" alt="${product.name}">
+                    <h3>${product.name}</h3>
+                    <p class="price">${formatPrice(product.price)}</p>
+                    <button class="btn" onclick="addToCart('${product.name}', ${product.price})">Agregar al Carrito</button>
+                `;
+                productList.appendChild(productCard);
+            });
+        }
+
+        function addToCart(name, price) {
+            const product = cart.find(item => item.name === name);
+            if (product) {
+                product.quantity += 1;
+            } else {
+                cart.push({ name, price, quantity: 1 });
+            }
+            updateCartCount();
+        }
+
+        function updateCartCount() {
+            const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+            const cartCount = document.getElementById('cartCount');
+            cartCount.textContent = totalItems;
+            
+            if (totalItems === 0) {
+                cartCount.style.display = 'none';
+            } else {
+                cartCount.style.display = 'flex';
+            }
+        }
+
+        function displayCart() {
+            const cartItems = document.getElementById('cartItems');
+            const cartTotal = document.getElementById('cartTotal');
+            cartItems.innerHTML = '';
+            
+            let total = 0;
+            
+            cart.forEach((item, index) => {
+                const row = document.createElement('tr');
+                const subtotal = item.price * item.quantity;
+                total += subtotal;
+                
+                row.innerHTML = `
+                    <td>${item.name}</td>
+                    <td>
+                        <button onclick="updateQuantity(${index}, -1)">-</button>
+                        ${item.quantity}
+                        <button onclick="updateQuantity(${index}, 1)">+</button>
+                    </td>
+                    <td>${formatPrice(item.price)}</td>
+                    <td>${formatPrice(subtotal)}</td>
+                    <td><button class="delete-btn" onclick="removeFromCart(${index})">Eliminar</button></td>
+                `;
+                cartItems.appendChild(row);
+            });
+            
+            cartTotal.textContent = `Total: ${formatPrice(total)}`;
+        }
+
+        function updateQuantity(index, change) {
+            cart[index].quantity += change;
+            if (cart[index].quantity <= 0) {
+                cart.splice(index, 1);
+            }
+            updateCartCount();
+            displayCart();
+        }
+
+        function removeFromCart(index) {
+            cart.splice(index, 1);
+            updateCartCount();
+            displayCart();
+        }
+
+        function showCart() {
+            document.getElementById('cartModal').style.display = 'block';
+            document.querySelector('.modal-overlay').style.display = 'block';
+            displayCart();
+        }
+
+        function closeCart() {
+            document.getElementById('cartModal').style.display = 'none';
+            document.querySelector('.modal-overlay').style.display = 'none';
+        }
+
+        document.getElementById('cartButton').addEventListener('click', showCart);
+
+        document.getElementById('emptyCartButton').addEventListener('click', function() {
+            cart = [];
+            updateCartCount();
+            displayCart();
+        });
+
+       
+
+        document.getElementById('payButton').addEventListener('click', function () {
+    const paymentMethod = document.getElementById('paymentMethod').value;
+    const paymentMessage = document.getElementById('paymentMessage');
+
+    if (!paymentMethod) {
+        paymentMessage.textContent = 'Por favor seleccione un método de pago';
+        paymentMessage.style.color = 'red';
+        return;
+    }
+
+    if (cart.length === 0) {
+        paymentMessage.textContent = 'El carrito está vacío';
+        paymentMessage.style.color = 'red';
+        return;
+    }
+
+    if (paymentMethod === 'efectivo') {
+        paymentMessage.textContent = 'Pago pendiente: por favor pague en efectivo antes de 24 horas.';
+        paymentMessage.style.color = 'red'; // Mensaje en rojo
+        generateReceipt(); // Generar recibo
+    } else {
+        paymentMessage.textContent = `Procesando pago con ${paymentMethod}...`;
+        paymentMessage.style.color = 'green'; // Mensaje en verde para otros métodos
+    }
+
+    setTimeout(() => {
+        cart = []; // Vaciar carrito en ambos casos
+        updateCartCount();
+        displayCart();
+        paymentMessage.textContent = '¡Gracias por su compra!';
+        paymentMessage.style.color = 'green'; // Mensaje final en verde
+    }, 2000);
+});
+
+// Función para calcular el total de la compra
+function calculateTotal() {
+    return cart.reduce((total, item) => total + item.price * item.quantity, 0);
+}
+
+// Función para generar un recibo en efectivo
+function generateReceipt() {
+    const total = calculateTotal();
+    const receiptContent = `
+        Recibo de pago en efectivo
+        ==========================
+        Fecha: ${new Date().toLocaleString()}
+        Total de productos: ${cart.length}
+        Total compra: $${total.toFixed(2)}
+        Gracias por su compra.
+    `;
+
+    const blob = new Blob([receiptContent], { type: 'text/plain' });
+    const receiptURL = URL.createObjectURL(blob);
+
+    const downloadLink = document.createElement('a');
+    downloadLink.href = receiptURL;
+    downloadLink.download = 'Recibo_Pago_Efectivo.txt';
+    downloadLink.click();
+
+    URL.revokeObjectURL(receiptURL); // Liberar memoria
+}
+
+
+
+        document.getElementById('searchInput').addEventListener('input', function(e) {
+            const searchTerm = e.target.value.toLowerCase();
+            const filteredProducts = products.filter(product => 
+                product.name.toLowerCase().includes(searchTerm)
+            );
+            displayProducts(filteredProducts);
+        });
+
+        // Mostrar todos los productos al cargar la página
+        displayProducts(products);
+    </script>
+</body>
+</html>
